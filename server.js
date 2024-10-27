@@ -10,7 +10,7 @@ app.use(upload.single('image'));
 
 // CORS options
 const corsOptions = {
-  origin: 'http://127.0.0.1:5502', // Make sure this is the correct origin for your frontend
+  origin: 'https://grandhalayam.vercel.app/', // Make sure this is the correct origin for your frontend
   optionsSuccessStatus: 200 
 };
 

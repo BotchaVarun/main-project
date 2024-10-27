@@ -1,8 +1,8 @@
-function tog()
-{
-    const menu_bar=document.querySelector('.menu');
+function tog() {
+    const menu_bar = document.querySelector('.menu');
     menu_bar.classList.toggle('increase');
 }
+
 function toggled() {
     const account = document.querySelector('.account-profile');
     const overlay = document.querySelector('.overlay');
@@ -16,13 +16,14 @@ function closed() {
     account.style.display = 'none';
     overlay.style.display = 'none';
 }
+
 function magazine() {
     const booksDiv = document.querySelector('.available');
     const bookdomain = document.querySelector('.magdomain');
 
     // Function to fetch books based on selected domain
     const fetchBooks = (domain) => {
-        fetch(`http://localhost:3002/magazine?domain=${domain}`)
+        fetch(`https://grandhalayam.vercel.app/magazine?domain=${domain}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
@@ -84,7 +85,7 @@ function magazine() {
                 const currentStatus = buttonElement.innerText.toLowerCase() === 'borrow' ? 'available' : 'taken';
                 const newStatus = currentStatus === 'available' ? 'taken' : 'available';
 
-                fetch(`http://localhost:3002/magazine/${bookId}`, {
+                fetch(`https://grandhalayam.vercel.app/magazine/${bookId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -129,9 +130,10 @@ function magazine() {
     const initialDomain = bookdomain.value;
     fetchBooks(initialDomain);
 }
+
 // Function to fetch user details and update the profile
 const fetchUserProfile = () => {
-    fetch('http://localhost:3002/user', {
+    fetch('https://grandhalayam.vercel.app/user', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -149,7 +151,7 @@ const fetchUserProfile = () => {
         document.getElementById('name').textContent = data.name || 'N/A';
         document.getElementById('phone').textContent = data.phone || 'N/A';
         document.getElementById('email').textContent = data.email || 'N/A';
-        document.getElementById('role').textContent =  data.name==="Admin"? "Admin":"Student" || 'N/A';
+        document.getElementById('role').textContent =  data.name === "Admin" ? "Admin" : "Student" || 'N/A';
     })
     .catch(error => {
         console.error('Error fetching user details:', error);
@@ -158,9 +160,8 @@ const fetchUserProfile = () => {
 };
 
 // Function to logout (you can implement this according to your logout logic)
-
 function logout() {
-    fetch('http://localhost:3002/logout', {
+    fetch('https://grandhalayam.vercel.app/logout', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
