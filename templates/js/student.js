@@ -166,7 +166,6 @@ function logout() {
         console.log("Logout response:", response.status, text);
         if (response.status === 404) {
             console.error("No active session found to log out");
-            
         } else if (!response.ok) {
             throw new Error("Logout failed");
         }

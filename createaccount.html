@@ -19,7 +19,7 @@
     <section id class="login">
         <div class id="logintab">
             <div class="wrapper">
-            <form action="#">
+            <form action="signUp(event)">
               <h2>Create New Acoount</h2>
               <div class="input-field">
                 <input type="text" id="name" required>
@@ -37,7 +37,7 @@
                 <input type="password" id="password" required>
                 <label>Enter your password</label>
               </div>
-              <button type="submit" class="btn btn-outline-success btn-lg shadow" onclick="signUp()" >Submit</button>
+              <button type="submit" class="btn btn-outline-success btn-lg shadow" onclick="signUp(event)" >Submit</button>
             </form>
           </div>
         </div>
@@ -72,8 +72,8 @@
         <p>Copyright &#169; 2024 Grandhalayam . All Rights Reserved.</p>
     </footer>
     <script>
-      async function signUp() {
-
+      async function signUp(event) {
+        event.preventDefault();
         const name = document.getElementById("name").value;
         const phoneno = document.getElementById("number").value;
         const email = document.getElementById("email").value;
@@ -89,10 +89,10 @@
 
         try {
           const res = await fetch("http://localhost:3002/signup", options);
-
+            
           if (res.status === 201) {
             alert("User created successfully");
-            window.location.href = "../index.html";
+            window.location.href = "../login.html";
           } else if (res.status === 409) {
             alert("User with this email already exists");
           } else {
