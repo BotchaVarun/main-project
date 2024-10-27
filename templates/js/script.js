@@ -31,7 +31,8 @@
 //   catch (error) {
 //     console.error("Error:", error);
 // }
-}
+//}
+
 async function submit() {
        let email = document.getElementById("email").value;
        let password = document.getElementById("password").value;

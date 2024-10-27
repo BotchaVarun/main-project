@@ -8,13 +8,15 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 app.use(upload.single('image'));
 
+// CORS options
 const corsOptions = {
-  origin: 'http://127.0.0.1:5501',
+  origin: 'http://127.0.0.1:5502', // Make sure this is the correct origin for your frontend
   optionsSuccessStatus: 200 
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
 
 app.get("/add", (req, res) => {
   return res.send("<h1>Hello</h1>");
@@ -87,6 +89,9 @@ const Mag = mongoose.model("Mag",magazineSchema);
 const Com = mongoose.model("Com",comicSchema);
 var jsonparser = bodyparser.json();
 
+app.post('/submit', (req, res) => {
+  res.send('Data received!');
+});
 
 app.post("/signup", jsonparser, (req, res) => {
   const { name, phoneno, email, password } = req.body;
@@ -480,25 +485,26 @@ app.post('/book', bodyparser.json(), (req, res) => {
     .then(() => res.status(201).send("Book added successfully"))
     .catch(error => res.status(500).send("Error adding book"));
 });
-app.put('/logout', bodyparser.json(), (req, res) => {
+app.get('/logout', (req, res) => {
+  return res.send("<h1>Hello</h1>");
+})
+app.put('/logout', (req, res) => {
   Log.findOne({ status: "true" }).then(log => {
-    if (!log) {
-      return res.status(404).send("No active session found");
-    }
-    
-
-    log.status = "false";
-    log.save()
-      .then(() => {
-        res.status(200).send("Account is logged out");
-      })
-      .catch(error => {
-        console.error('Error updating log status:', error);
-        res.status(500).send("Error during logout");
-      });
+      if (!log) {
+          return res.status(404).send("No active session found");
+      }
+      log.status = "false";
+      log.save()
+          .then(() => {
+              res.status(200).send("Account is logged out");
+          })
+          .catch(error => {
+              console.error('Error updating log status:', error);
+              res.status(500).send("Error during logout");
+          });
   }).catch(error => {
-    console.error('Error finding log entry:', error);
-    res.status(500).send("Error during logout");
+      console.error('Error finding log entry:', error);
+      res.status(500).send("Error during logout");
   });
 });
 /* login user information */

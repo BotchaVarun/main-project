@@ -17,28 +17,29 @@
     <section id class="login">
         <div class id="logintab">
             <div class="wrapper">
-            <form action="#">
-              <h2>Login</h2>
+              <form onsubmit="myFunction(event)">
+                <h2>Login</h2>
                 <div class="input-field">
-                <input type="text" id="email" required>
-                <label>Enter your email</label>
-              </div>
-              <div class="input-field">
-                <input type="password" id="password" required>
-                <label>Enter your password</label>
-              </div>
-              <div class="forget">
-                <label for="remember">
-                  <input type="checkbox" id="remember">
-                  <p>Remember me</p>
-                </label>
-                <a href="#">Forgot password?</a>
-              </div>
-              <button type="submit" class="btn btn-outline-success btn-lg shadow" onClick="myFunction()">Submit</button>
-              <div class="register">
-                <p>Don't have an account? <a href="createaccount.html">Register</a></p>
-              </div>
+                    <input type="text" id="email" required>
+                    <label>Enter your email</label>
+                </div>
+                <div class="input-field">
+                    <input type="password" id="password" required>
+                    <label>Enter your password</label>
+                </div>
+                <div class="forget">
+                    <label for="remember">
+                        <input type="checkbox" id="remember">
+                        <p>Remember me</p>
+                    </label>
+                    <a href="#">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn btn-outline-success btn-lg shadow">Submit</button>
+                <div class="register">
+                    <p>Don't have an account? <a href="createaccount.html">Register</a></p>
+                </div>
             </form>
+            
           </div>
         </div>
 
@@ -74,7 +75,42 @@
         <p>Copyright &#169; 2024 Grandhalayam . All Rights Reserved.</p>
     </footer>
     <script >
-
+      async function myFunction(event){
+        event.preventDefault(); // Prevent the default form submission
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+        console.log(email,password);
+        const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              email: email,
+              password: password
+            }),
+          };
+          try {
+            const res = await fetch("http://localhost:3002/signin", options);
+            if(res.status==200)
+            {
+              alert("sign in successfully");
+              if(email=="varunbotcha@gmail.com"&&password==="1234"){
+                window.location.href="../admin.html";
+              }
+              else{
+              window.location.href="../index.html";
+              }
+            }
+            else{
+              alert("Invalid credentials");
+              return  
+            }
+            }
+          catch (error) {
+            console.error("Error:", error);
+        }
+        }
     </script>
     
 

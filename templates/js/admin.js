@@ -708,7 +708,7 @@ function logout() {
     }).then(response => {
         if (response.ok) {
             console.log("Logged out successfully");
-            window.location.href = "../index.html";
+            window.location.href = "../login.html";
         } else {
             console.error("Logout failed");
         }

@@ -161,23 +161,24 @@ const fetchUserProfile = () => {
 // Function to logout (you can implement this according to your logout logic)
 
 function logout() {
-    fetch('http://localhost:3002/logout', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: "false" })
-    }).then(response => {
-        if (response.ok) {
-            console.log("Logged out successfully");
-            window.location.href = "../index.html";
-        } else {
-            console.error("Logout failed");
+    fetch('http://localhost:3002/logout', { method: 'PUT' })
+    .then(response => response.text().then(text => {
+        console.log("Logout response:", response.status, text);
+        if (response.status === 404) {
+            console.error("No active session found to log out");
+            
+        } else if (!response.ok) {
+            throw new Error("Logout failed");
         }
-    }).catch(error => {
-        console.error("Error during logout:", error);
+        console.log("Logout successful, redirecting to index.html");
+        window.location.href = "../login.html";
+    }))
+    .catch(error => {
+        console.error("Error during logout:", error.message);
     });
+
 }
+
 // Call fetchUserProfile when the page loads or when you need to update user details
 document.addEventListener('DOMContentLoaded', fetchUserProfile);
 document.addEventListener('DOMContentLoaded', books);
