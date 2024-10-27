@@ -1,42 +1,36 @@
-function tog()
-{
-    const menu_bar=document.querySelector('.menu');
+// Toggles the menu's expanded view
+function tog() {
+    const menu_bar = document.querySelector('.menu');
     menu_bar.classList.toggle('increase');
 }
+
+// Opens account profile with overlay
 function toggled() {
-    const account = document.querySelector('.account-profile');
-    const overlay = document.querySelector('.overlay');
-    account.style.display = 'block';
-    overlay.style.display = 'block';
+    document.querySelector('.account-profile').classList.add('visible');
+    document.querySelector('.overlay').classList.add('visible');
 }
 
+// Closes account profile with overlay
 function closed() {
-    const account = document.querySelector('.account-profile');
-    const overlay = document.querySelector('.overlay');
-    account.style.display = 'none';
-    overlay.style.display = 'none';
+    document.querySelector('.account-profile').classList.remove('visible');
+    document.querySelector('.overlay').classList.remove('visible');
 }
 
+// Function to fetch books based on selected domain
 function books() {
     const booksDiv = document.querySelector('.available');
     const bookdomain = document.querySelector('.book-domain');
 
-    // Function to fetch books based on selected domain
+    // Helper function to get API URL
+    const getApiUrl = (path) => `${window.location.origin}${path}`;
+
     const fetchBooks = (domain) => {
-        fetch(`http://localhost:3002/book?domain=${domain}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
+        fetch(getApiUrl(`/book?domain=${domain}`))
+            .then(response => response.ok ? response.json() : Promise.reject(response.statusText))
             .then(data => {
                 booksDiv.innerHTML = '';
-                data.forEach(book => {
-                    const bookElement = createBookElement(book);
-                    booksDiv.appendChild(bookElement);
-                });
-                addBorrowButtonEvents(); // Add event listeners after elements are added to DOM
+                data.forEach(book => booksDiv.appendChild(createBookElement(book)));
+                addBorrowButtonEvents();
             })
             .catch(error => {
                 console.error('Error fetching books:', error);
@@ -65,8 +59,8 @@ function books() {
                     <li style="font-size:12px;">Description: ${book.desc}</li>
                     <hr>
                     <li>Status: ${book.status}</li>
-                    <li style="color:#000; cursor:pointer; font-family: Montserrat, sans-serif; font-weight: 500;" class="borrow-button" data-id="${book._id}">
-                      <button class="borrow-btn">${book.status === 'taken' ? 'Return' : 'Borrow'}</button>
+                    <li class="borrow-button" data-id="${book._id}">
+                        <button class="borrow-btn">${book.status === 'taken' ? 'Return' : 'Borrow'}</button>
                     </li>
                 </ul>
             </div>
@@ -74,110 +68,63 @@ function books() {
         return bookElement;
     };
 
-    // Function to add event listeners to borrow buttons
+    // Event listener to change borrow button status
     const addBorrowButtonEvents = () => {
-        const borrowButtons = document.querySelectorAll('.borrow-btn');
-        borrowButtons.forEach(button => {
+        document.querySelectorAll('.borrow-btn').forEach(button => {
             button.addEventListener('click', (event) => {
-                const buttonElement = event.target;
-                const bookElement = buttonElement.closest('.borrow-button');
+                const bookElement = event.target.closest('.borrow-button');
                 const bookId = bookElement.getAttribute('data-id');
-                const currentStatus = buttonElement.innerText.toLowerCase() === 'borrow' ? 'available' : 'taken';
+                const currentStatus = event.target.innerText.toLowerCase() === 'borrow' ? 'available' : 'taken';
                 const newStatus = currentStatus === 'available' ? 'taken' : 'available';
 
-                fetch(`http://localhost:3002/books/${bookId}`, {
+                fetch(getApiUrl(`/books/${bookId}`), {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: newStatus })
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(response => response.ok ? response.json() : Promise.reject('Error updating book status'))
                 .then(data => {
-                    if (data.error) {
-                        console.error(data.error);
-                    } else {
-                        if (newStatus === 'taken') {
-                            buttonElement.innerText = 'Return';
-                            buttonElement.style.backgroundColor = 'red';
-                        } else {
-                            buttonElement.innerText = 'Borrow';
-                            buttonElement.style.backgroundColor = '';
-                        }
-                        bookElement.previousElementSibling.querySelector('li:nth-child(5)').innerText = `Status: ${newStatus}`;
-                    }
+                    event.target.innerText = newStatus === 'taken' ? 'Return' : 'Borrow';
+                    bookElement.previousElementSibling.querySelector('li:nth-child(5)').innerText = `Status: ${newStatus}`;
                 })
-                .catch(error => {
-                    console.error('Error updating book status:', error);
-                });
+                .catch(error => console.error('Error updating book status:', error));
             });
         });
     };
 
-    // Event listener for book domain selection change
-    bookdomain.addEventListener('change', () => {
-        const selectedDomain = bookdomain.value;
-        console.log("Selected domain:", selectedDomain);
-        fetchBooks(selectedDomain);
-    });
-
-    // Initial fetch of books based on initial domain selection
-    const initialDomain = bookdomain.value;
-    fetchBooks(initialDomain);
+    bookdomain.addEventListener('change', () => fetchBooks(bookdomain.value));
+    fetchBooks(bookdomain.value);
 }
-// Function to fetch user details and update the profile
+
+// Fetches user profile data on load
 const fetchUserProfile = () => {
-    fetch('http://localhost:3002/user', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-            // You might need to include additional headers for authentication if required
-        },
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Update DOM with fetched user details
-        document.getElementById('name').textContent = data.name || 'N/A';
-        document.getElementById('phone').textContent = data.phone || 'N/A';
-        document.getElementById('email').textContent = data.email || 'N/A';
-        document.getElementById('role').textContent = data.email=="varunbotcha@gmail.com"? "Admin":"Student" || 'N/A';
-    })
-    .catch(error => {
-        console.error('Error fetching user details:', error);
-        // Handle error condition (e.g., display an error message)
-    });
+    fetch(`${window.location.origin}/user`)
+        .then(response => response.ok ? response.json() : Promise.reject('Failed to fetch user data'))
+        .then(data => {
+            document.getElementById('name').textContent = data.name || 'N/A';
+            document.getElementById('phone').textContent = data.phone || 'N/A';
+            document.getElementById('email').textContent = data.email || 'N/A';
+            document.getElementById('role').textContent = data.email === "varunbotcha@gmail.com" ? "Admin" : "Student";
+        })
+        .catch(error => console.error('Error fetching user details:', error));
 };
 
-// Function to logout (you can implement this according to your logout logic)
-
+// Function to handle user logout
 function logout() {
-    fetch('http://localhost:3002/logout', { method: 'PUT' })
-    .then(response => response.text().then(text => {
-        console.log("Logout response:", response.status, text);
-        if (response.status === 404) {
-            console.error("No active session found to log out");
-        } else if (!response.ok) {
-            throw new Error("Logout failed");
-        }
-        console.log("Logout successful, redirecting to index.html");
-        window.location.href = "../login.html";
-    }))
-    .catch(error => {
-        console.error("Error during logout:", error.message);
-    });
-
+    fetch(`${window.location.origin}/logout`, { method: 'PUT' })
+        .then(response => {
+            if (response.ok) {
+                console.log("Logout successful, redirecting to index.html");
+                window.location.href = "../login.html";
+            } else {
+                console.error("Logout failed:", response.status);
+            }
+        })
+        .catch(error => console.error("Error during logout:", error));
 }
 
-// Call fetchUserProfile when the page loads or when you need to update user details
-document.addEventListener('DOMContentLoaded', fetchUserProfile);
-document.addEventListener('DOMContentLoaded', books);
+// Initial call to fetch user profile and available books on page load
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUserProfile();
+    books();
+});
