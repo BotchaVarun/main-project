@@ -21,16 +21,19 @@ app.use(express.json());
 app.get("/add", (req, res) => {
   return res.send("<h1>Hello</h1>");
 });
+//HKcPTKHPa9IV1rJ6
 
-const server = '127.0.0.1:27017'; 
-const database = 'main'; 
-mongoose.connect(`mongodb://${server}/${database}`, { useNewUrlParser: true, useUnifiedTopology: true })
+
+// MongoDB Atlas connection string with your password
+const uri = 'mongodb+srv://botchavarunle23csm:HKcPTKHPa9IV1rJ6@cluster0.y9ys4.mongodb.net/main?retryWrites=true&w=majority&appName=Cluster0';
+
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
-        console.log('Database connection successful');
+        console.log('Database connection successful 22');
     })
     .catch((err) => {
         console.error('Database connection failed', err);
-});
+    });
 
 const userSchema = new mongoose.Schema({
   name:String,
